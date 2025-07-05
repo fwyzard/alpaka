@@ -58,10 +58,9 @@ TEMPLATE_LIST_TEST_CASE("mdSpan", "[memView]", alpaka::test::TestAccs)
             auto counter = 0;
             alpaka::meta::ndLoopIncIdx(
                 extent,
-                [&](auto ind)
+                [&]([[maybe_unused]] auto ind)
                 {
-                    [[maybe_unused]] auto const a = alpaka::toArray(ind);
-                    ALPAKA_CHECK(*success, mds(a) == counter);
+                    ALPAKA_CHECK(*success, mds[ind] == counter);
                     counter++;
                 });
         }));
@@ -76,10 +75,9 @@ TEMPLATE_LIST_TEST_CASE("mdSpan", "[memView]", alpaka::test::TestAccs)
             alpaka::meta::ndLoop(
                 make_reverse_index_sequence<Dim::value>{},
                 extentTransposed,
-                [&](auto ind)
+                [&]([[maybe_unused]] auto ind)
                 {
-                    [[maybe_unused]] auto const a = alpaka::toArray(ind);
-                    ALPAKA_CHECK(*success, mdst(a) == counter);
+                    ALPAKA_CHECK(*success, mdst[ind] == counter);
                     counter++;
                 });
         }));

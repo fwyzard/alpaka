@@ -64,7 +64,7 @@ private:
                     c[Dim - 1] = threadFirstElemIdx[Dim - 1];
                     auto const random = Gen::generate(c, key);
                     // to make use of the whole random vector we would need to ensure numElement[0] % 4 == 0
-                    dst(alpaka::toArray(threadFirstElemIdx)) = TElem(random[0]);
+                    dst[threadFirstElemIdx] = TElem(random[0]);
                 }
             }
             threadFirstElemIdx[I] = firstElem;
