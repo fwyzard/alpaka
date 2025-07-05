@@ -19,6 +19,7 @@
 #include "alpaka/vec/Traits.hpp"
 
 #include <algorithm>
+#include <array>
 #include <cstdint>
 #include <functional>
 #include <limits>
@@ -29,12 +30,9 @@
 
 namespace alpaka
 {
-    template<typename TDim, typename TVal>
-    class Vec;
-
     //! A n-dimensional vector.
     template<typename TDim, typename TVal>
-    class Vec final
+    class Vec final : public std::array<TVal, TDim::value>
     {
     public:
         static_assert(TDim::value >= 0u, "Invalid dimensionality");
@@ -44,12 +42,14 @@ namespace alpaka
         using value_type = Val; //!< STL-like value_type.
 
     private:
+        using ArrayBase = std::array<TVal, TDim::value>;
+
         //! A sequence of integers from 0 to dim-1.
         //! This can be used to write compile time indexing algorithms.
         using IdxSequence = std::make_integer_sequence<std::size_t, TDim::value>;
 
     public:
-        ALPAKA_FN_HOST_ACC constexpr Vec() : m_data{}
+        ALPAKA_FN_HOST_ACC constexpr Vec() : ArrayBase{}
         {
         }
 
@@ -60,7 +60,7 @@ namespace alpaka
             typename... TArgs,
             typename = std::enable_if_t<
                 sizeof...(TArgs) == TDim::value && (std::is_convertible_v<std::decay_t<TArgs>, TVal> && ...)>>
-        ALPAKA_FN_HOST_ACC constexpr Vec(TArgs&&... args) : m_data{static_cast<TVal>(std::forward<TArgs>(args))...}
+        ALPAKA_FN_HOST_ACC constexpr Vec(TArgs&&... args) : ArrayBase{static_cast<TVal>(std::forward<TArgs>(args))...}
         {
         }
 
@@ -76,7 +76,7 @@ namespace alpaka
     private:
         template<typename F, std::size_t... Is>
         ALPAKA_FN_HOST_ACC constexpr explicit Vec(F&& generator, std::index_sequence<Is...>)
-            : m_data{generator(std::integral_constant<std::size_t, Is>{})...}
+            : ArrayBase{generator(std::integral_constant<std::size_t, Is>{})...}
         {
         }
 
@@ -108,46 +108,6 @@ namespace alpaka
             return all(static_cast<TVal>(1));
         }
 
-        ALPAKA_FN_HOST_ACC constexpr auto begin() -> TVal*
-        {
-            return m_data;
-        }
-
-        ALPAKA_FN_HOST_ACC constexpr auto begin() const -> TVal const*
-        {
-            return m_data;
-        }
-
-        ALPAKA_FN_HOST_ACC constexpr auto end() -> TVal*
-        {
-            return m_data + TDim::value;
-        }
-
-        ALPAKA_FN_HOST_ACC constexpr auto end() const -> TVal const*
-        {
-            return m_data + TDim::value;
-        }
-
-        ALPAKA_FN_HOST_ACC constexpr auto front() -> TVal&
-        {
-            return m_data[0];
-        }
-
-        ALPAKA_FN_HOST_ACC constexpr auto front() const -> TVal const&
-        {
-            return m_data[0];
-        }
-
-        ALPAKA_FN_HOST_ACC constexpr auto back() -> TVal&
-        {
-            return m_data[Dim::value - 1];
-        }
-
-        ALPAKA_FN_HOST_ACC constexpr auto back() const -> TVal const&
-        {
-            return m_data[Dim::value - 1];
-        }
-
         //! access elements by name
         //!
         //! names: x,y,z,w
@@ -155,49 +115,49 @@ namespace alpaka
         template<typename TDefer = Dim, std::enable_if_t<std::is_same_v<TDefer, Dim> && Dim::value >= 1, int> = 0>
         ALPAKA_FN_HOST_ACC constexpr decltype(auto) x() const
         {
-            return m_data[Dim::value - 1];
+            return this->data()[Dim::value - 1];
         }
 
         template<typename TDefer = Dim, std::enable_if_t<std::is_same_v<TDefer, Dim> && Dim::value >= 1, int> = 0>
         ALPAKA_FN_HOST_ACC constexpr decltype(auto) x()
         {
-            return m_data[Dim::value - 1];
+            return this->data()[Dim::value - 1];
         }
 
         template<typename TDefer = Dim, std::enable_if_t<std::is_same_v<TDefer, Dim> && Dim::value >= 2, int> = 0>
         ALPAKA_FN_HOST_ACC constexpr decltype(auto) y() const
         {
-            return m_data[Dim::value - 2];
+            return this->data()[Dim::value - 2];
         }
 
         template<typename TDefer = Dim, std::enable_if_t<std::is_same_v<TDefer, Dim> && Dim::value >= 2, int> = 0>
         ALPAKA_FN_HOST_ACC constexpr decltype(auto) y()
         {
-            return m_data[Dim::value - 2];
+            return this->data()[Dim::value - 2];
         }
 
         template<typename TDefer = Dim, std::enable_if_t<std::is_same_v<TDefer, Dim> && Dim::value >= 3, int> = 0>
         ALPAKA_FN_HOST_ACC constexpr decltype(auto) z() const
         {
-            return m_data[Dim::value - 3];
+            return this->data()[Dim::value - 3];
         }
 
         template<typename TDefer = Dim, std::enable_if_t<std::is_same_v<TDefer, Dim> && Dim::value >= 3, int> = 0>
         ALPAKA_FN_HOST_ACC constexpr decltype(auto) z()
         {
-            return m_data[Dim::value - 3];
+            return this->data()[Dim::value - 3];
         }
 
         template<typename TDefer = Dim, std::enable_if_t<std::is_same_v<TDefer, Dim> && Dim::value >= 4, int> = 0>
         ALPAKA_FN_HOST_ACC constexpr decltype(auto) w() const
         {
-            return m_data[Dim::value - 4];
+            return this->data()[Dim::value - 4];
         }
 
         template<typename TDefer = Dim, std::enable_if_t<std::is_same_v<TDefer, Dim> && Dim::value >= 4, int> = 0>
         ALPAKA_FN_HOST_ACC constexpr decltype(auto) w()
         {
-            return m_data[Dim::value - 4];
+            return this->data()[Dim::value - 4];
         }
 
         //! @}
@@ -211,7 +171,7 @@ namespace alpaka
             core::assertValueUnsigned(iIdx);
             auto const idx = static_cast<typename TDim::value_type>(iIdx);
             core::assertGreaterThan<TDim>(idx);
-            return m_data[idx];
+            return this->data()[idx];
         }
 
         //! Value accessor at the given non-unsigned integer index.
@@ -223,7 +183,7 @@ namespace alpaka
             core::assertValueUnsigned(iIdx);
             auto const idx = static_cast<typename TDim::value_type>(iIdx);
             core::assertGreaterThan<TDim>(idx);
-            return m_data[idx];
+            return this->data()[idx];
         }
 
         ALPAKA_NO_HOST_ACC_WARNING
@@ -232,7 +192,7 @@ namespace alpaka
             TFnObj const& f,
             std::integer_sequence<std::size_t, TIndices...>) const
         {
-            return meta::foldr(f, (*this)[TIndices]...);
+            return meta::foldr(f, this->data()[TIndices]...);
         }
 
         ALPAKA_NO_HOST_ACC_WARNING
@@ -242,7 +202,7 @@ namespace alpaka
             std::integer_sequence<std::size_t, TIndices...>,
             TVal initial) const
         {
-            return meta::foldr(f, (*this)[TIndices]..., initial);
+            return meta::foldr(f, this->data()[TIndices]..., initial);
         }
 
         ALPAKA_NO_HOST_ACC_WARNING
@@ -319,26 +279,28 @@ namespace alpaka
         [[nodiscard]] ALPAKA_FN_HOST constexpr auto minElem() const -> typename TDim::value_type
         {
             return static_cast<typename TDim::value_type>(
-                std::distance(std::begin(m_data), std::min_element(std::begin(m_data), std::end(m_data))));
+                std::distance(std::begin(*this), std::min_element(std::begin(*this), std::end(*this))));
         }
 
         //! \return The index of the maximal element.
         [[nodiscard]] ALPAKA_FN_HOST constexpr auto maxElem() const -> typename TDim::value_type
         {
             return static_cast<typename TDim::value_type>(
-                std::distance(std::begin(m_data), std::max_element(std::begin(m_data), std::end(m_data))));
+                std::distance(std::begin(*this), std::max_element(std::begin(*this), std::end(*this))));
         }
 
         template<size_t I>
         ALPAKA_FN_HOST_ACC constexpr auto get() -> TVal&
         {
-            return (*this)[I];
+            static_assert(I < Dim::value);
+            return this->data()[I];
         }
 
         template<size_t I>
         [[nodiscard]] ALPAKA_FN_HOST_ACC constexpr auto get() const -> TVal
         {
-            return (*this)[I];
+            static_assert(I < Dim::value);
+            return this->data()[I];
         }
 
         //! \return The number of dimensions of the vector.
@@ -515,10 +477,6 @@ namespace alpaka
 
             return os;
         }
-
-    private:
-        // Zero sized arrays are not allowed, therefore zero-dimensional vectors have one member.
-        TVal m_data[TDim::value == 0u ? 1u : TDim::value];
     };
 
     template<typename TFirstIndex, typename... TRestIndices>
@@ -531,17 +489,11 @@ namespace alpaka
     template<typename TDim, typename TVal>
     inline constexpr bool isVec<Vec<TDim, TVal>> = true;
 
-    //! Converts a Vec to a std::array
+    //! Legacy function (a Vec is already an std::array)
     template<typename TDim, typename TVal>
     ALPAKA_FN_HOST_ACC constexpr auto toArray(Vec<TDim, TVal> const& v) -> std::array<TVal, TDim::value>
     {
-        std::array<TVal, TDim::value> a{};
-        if constexpr(TDim::value > 0)
-        {
-            for(unsigned i = 0; i < TDim::value; i++)
-                a[i] = v[i];
-        }
-        return a;
+        return v;
     }
 
     //! \return The element-wise minimum of one or more vectors.
