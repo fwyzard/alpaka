@@ -5,7 +5,7 @@
 #include "alpaka/exec/ElementIndex.hpp"
 #include "alpaka/idx/Accessors.hpp"
 
-#include <algorithm>
+#include <concepts>
 #include <cstddef>
 #include <type_traits>
 
@@ -14,6 +14,13 @@ namespace alpaka
 
     namespace detail
     {
+        /* Returns the smaller of the given values, using operator< to compare the values.
+         */
+        template<std::integral T>
+        ALPAKA_FN_ACC inline constexpr T xtd_min(const T x, const T y)
+        {
+            return (y < x) ? y : x;
+        }
 
         /* UniformElementsAlong
          *
@@ -134,7 +141,7 @@ namespace alpaka
                     // increment
                     stride_{stride - elements}
                     , extent_{extent}
-                    , index_{std::min(first, extent)}
+                    , index_{xtd_min(first, extent)}
                 {
                 }
 
@@ -514,7 +521,7 @@ namespace alpaka
                         overflow = true;
                     }
                     index_[I] = first_[I];
-                    range_[I] = std::min(first_[I] + loop_->elements_[I], loop_->extent_[I]);
+                    range_[I] = xtd_min(first_[I] + loop_->elements_[I], loop_->extent_[I]);
                     return overflow;
                 }
 
@@ -706,7 +713,7 @@ namespace alpaka
                 ALPAKA_FN_ACC inline const_iterator(Idx stride, Idx extent, Idx first)
                     : stride_{stride}
                     , extent_{extent}
-                    , first_{std::min(first, extent)}
+                    , first_{xtd_min(first, extent)}
                 {
                 }
 
@@ -946,12 +953,12 @@ namespace alpaka
 
             ALPAKA_FN_ACC inline UniformGroupElementsAlong(TAcc const& acc, Idx block, Idx extent)
                 : first_{block * alpaka::getWorkDiv<alpaka::Block, alpaka::Elems>(acc)[Dim]}
-                , local_{std::min(
+                , local_{xtd_min(
                       extent - first_,
                       alpaka::getIdx<alpaka::Block, alpaka::Threads>(acc)[Dim]
                           * alpaka::getWorkDiv<alpaka::Thread, alpaka::Elems>(acc)[Dim])}
                 , range_{
-                      std::min(extent - first_, local_ + alpaka::getWorkDiv<alpaka::Thread, alpaka::Elems>(acc)[Dim])}
+                      xtd_min(extent - first_, local_ + alpaka::getWorkDiv<alpaka::Thread, alpaka::Elems>(acc)[Dim])}
             {
             }
 
