@@ -12,7 +12,8 @@
 #    include <hip/hip_version.h>
 
 // version numbers are only defined on the device side
-#    if !defined(ALPAKA_AMDGPU_ARCH) && defined(__HIP__) && __HIP_DEVICE_COMPILE__ == 1
+#    if !defined(ALPAKA_AMDGPU_ARCH) && defined(__HIP__) && defined(__HIP_DEVICE_COMPILE__)                           \
+        && __HIP_DEVICE_COMPILE__ == 1
 
 /* Map AMDGPU arch macro -> ALPAKA_VRRPP_TO_VERSION(wrapped code)
  *  Rules:
@@ -24,19 +25,37 @@
  * https://llvm.org/docs/AMDGPUUsage.html#processors
  */
 
-#        if defined(__gfx1200__)
-/* RDNA 4 dGPU (RX 9060 XT) */
-#            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(120000)
-#        elif defined(__gfx1201__)
-/* RDNA 4 dGPU (RX 9070 / 9070 XT) */
-#            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(120001)
-#        elif defined(__gfx1250__)
-/* RDNA 4 APU (APU) */
-#            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(120500)
-#        elif defined(__gfx1251__)
-/* RDNA 4 APU variant */
-#            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(120501)
+#        if defined(__gfx1310__)
+/* RDNA 5 dGPU (TBA) */
+#            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(130100)
 
+#        elif defined(__gfx1251__)
+/* RDNA 4 APU (TBA) */
+#            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(120501)
+#        elif defined(__gfx1250__)
+/* RDNA 4 APU (TBA) */
+#            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(120500)
+
+#        elif defined(__gfx1201__)
+/* RDNA 4 dGPU (RX 9070 / 9070 XT / 9070 GRE) */
+#            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(120001)
+#        elif defined(__gfx1200__)
+/* RDNA 4 dGPU (RX 9060 / 9060 XT) */
+#            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(120000)
+
+#        elif defined(__gfx1172__)
+/* RDNA 4m APU (TBA) */
+#            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(110702)
+#        elif defined(__gfx1171__)
+/* RDNA 4m APU (TBA) */
+#            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(110701)
+#        elif defined(__gfx1170__)
+/* RDNA 4m APU (TBA) */
+#            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(110700)
+
+#        elif defined(__gfx1154__)
+/* RDNA 3.5 iGPU (TBA) */
+#            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(110504)
 #        elif defined(__gfx1153__)
 /* RDNA 3.5 iGPU (Medusa Point / Strix Halo successor) */
 #            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(110503)
@@ -98,6 +117,9 @@
 /* RDNA 1 Desktop (RX 5700 / 5700 XT, Pro 5600 XT/M) */
 #            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(100100)
 
+#        elif defined(__gfx950__)
+/* CDNA 4 (Instinct MI350 series: MI350P/MI350X/MI355X) */
+#            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(90500)
 #        elif defined(__gfx942__)
 /* CDNA 3 (Instinct MI300 series: MI300/MI300A/MI300X) */
 #            define ALPAKA_AMDGPU_ARCH ALPAKA_VRRPP_TO_VERSION(90402)
