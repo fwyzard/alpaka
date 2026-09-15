@@ -340,8 +340,8 @@ namespace alpaka
         // The extent and the views may use different index types; compare them in a type that can
         // represent all of the values involved, to avoid both compilation errors and truncation.
         [[maybe_unused]] auto const extents = getExtents(extent);
-        using SrcCommon = std::common_type_t<Idx<TExtent>, Idx<TViewSrc>>;
-        using DstCommon = std::common_type_t<Idx<TExtent>, Idx<TViewDst>>;
+        using SrcCommon [[maybe_unused]] = std::common_type_t<Idx<TExtent>, Idx<TViewSrc>>;
+        using DstCommon [[maybe_unused]] = std::common_type_t<Idx<TExtent>, Idx<TViewDst>>;
         assert(
             (castVec<SrcCommon>(extents) <= castVec<SrcCommon>(getExtents(viewSrc))).all()
             && "The memcpy extent must not be larger than the source view's extent!");
